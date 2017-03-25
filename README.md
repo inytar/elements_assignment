@@ -24,10 +24,11 @@ Create a virtual environment and activate:
 Install dependencies:
 
     $ pip install -r requirements.txt
+    $ pip install -r dev_requirements.txt
 
 Create new database and database user:
 
-    $ sudo -u postgres psql -c "CREATE USER elements WITH PASSWORD 'elements'"
+    $ sudo -u postgres psql -c "CREATE USER elements WITH PASSWORD 'elements' CREATEDB"
     $ sudo -u postgres psql -c "CREATE DATBASE elements OWNER elements"
 
 Run the migrations
@@ -39,6 +40,12 @@ Run the migrations
 To run the application in development:
 
     $ python manage.py runserver
+
+# Testing
+
+To test run:
+
+    $ python manage.py test
 
 # Deploying
 
