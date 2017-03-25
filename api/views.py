@@ -62,7 +62,8 @@ class CSVViewSet(mixins.CreateModelMixin,
             data['url']
 
 
-class ImageViewSet(viewsets.ReadOnlyModelViewSet):
+class ImageViewSet(mixins.RetrieveModelMixin,
+                   viewsets.GenericViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
     renderer_classes = (JSONRenderer, ImageRenderer, BrowsableAPIRenderer)
