@@ -49,11 +49,15 @@ class CSVViewSet(mixins.CreateModelMixin,
         if not url:
             return None
         try:
-            # TODO get all csv images at once, should speed this up a lot!
+            # TODO We clearly have a performance issue here, we are
+            # running a query for every image we want to look up. In
+            # a future revision get all images associated with this
+            # csv at once, and then search for the correct one in python.
             image = Image.objects.get(original_url__iexact=url)
         except Image.DoesNotExist:
             # No image saved, just return None.
             return None
+        # Return the url to the image instance.
         return ImageSerializer(image, context={'request': self.request}).\
             data['url']
 
