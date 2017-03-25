@@ -1,7 +1,12 @@
 import os
+from unittest.mock import patch
+from urllib.parse import urlparse
 
 from django.core.files.images import ImageFile
 from django.test import TestCase
+from django.urls import reverse
+
+from rest_framework import status
 
 import requests
 
@@ -9,7 +14,9 @@ import requests_mock
 
 # Create your tests here.
 
+from elements_csv import settings
 from api import image_downloader
+from api.models import CSV
 
 
 class TestImageDownloader(TestCase):
@@ -50,6 +57,43 @@ class TestImageDownloader(TestCase):
             self.assertEqual(result[1], expected[1])
             self.assertTrue(isinstance(result[0], expected[0]))
 
+    # TODO Add test for ImageDownloader class.
 
-class TestCsvView(TestCase):
-    pass
+
+class TestCSVView(TestCase):
+
+    def _create_test_file(self, path):
+        f = open(path, 'w')
+        f.write('test123\n')
+        f.close()
+        f = open(path, 'rb')
+        return f
+
+    def test_upload_file_success(self): #, ImageDownloader):
+        url = reverse('csv-list')
+        data = self._create_test_file('/tmp/test_upload.csv')
+        data = {'csv_file': data}
+
+        response = self.client.post(url, data, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(urlparse(
+            response.data['csv_file']).path.startswith(settings.MEDIA_URL))
+        CSV.objects.get(pk=response.data['id'])
+
+    @patch('api.image_downloader.ImageDownloader')
+    def test_upload_file_bad_extension(self, ImageDownloader):
+        url = reverse('csv-list')
+        data = self._create_test_file('/tmp/test_upload.html')
+        data = {'csv_file': data}
+
+        response = self.client.post(url, data, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(ImageDownloader.called)
+
+    # def test_upload_file_not_parsable(self):
+    #     url = reverse('csv-list')
+    #     data = self._create_test_file('/tmp/test_upload.csv')
+    #     data = {'csv_file': data}
+
+    #     response = self.client.post(url, data, format='multipart')
+    #     self.assertEqual(response.status_code, status.HTTP_400_CREATED)
