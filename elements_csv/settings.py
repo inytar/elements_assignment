@@ -10,22 +10,24 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
-import os
+import environ
 
+root = environ.Path(__file__) - 3
+env = environ.Env(DEBUG=(bool, False))
+environ.Env.read_env()
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = root()
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '3@$_n8dh&0o$1o6$nqv_e0px0rse1gwi7e5d3grl%d57lm72nh'
+SECRET_KEY = env('SECRET_KEY',
+                 default='3@$_n8dh&0o$1o6$nqv_e0px0rse1gwi7e5d3grl%d57lm72nh')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+DEBUG = env('DEBUG', default=False)
 
 
 # Application definition
@@ -42,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = root('media')
 MEDIA_URL = '/media/'
 
 MIDDLEWARE = [
@@ -80,14 +82,9 @@ WSGI_APPLICATION = 'elements_csv.wsgi.application'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'elements',
-        'USER': 'elements',
-        'PASSWORD': 'elements',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-    }
+    'default': env.db(
+        default='postgresql://elements:elements@127.0.0.1:5432/elements'
+    )
 }
 
 

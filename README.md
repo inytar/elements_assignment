@@ -43,7 +43,7 @@ Run the migrations
 
 To run the application in development:
 
-    $ python manage.py runserver
+    $ DEBUG=True python manage.py runserver
 
 The api can be found under `http://127.0.0.1:8000/api`. Documentation can be found under `http://127.0.0.1:8000/docs`.
 
