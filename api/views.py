@@ -1,6 +1,8 @@
 import codecs
 import csv
 
+from django.utils.html import escape
+
 from rest_framework import decorators
 from rest_framework import mixins
 from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
@@ -40,8 +42,8 @@ class CSVViewSet(mixins.CreateModelMixin,
             # Skip first row if csv has a header.
             if i == 0 and csv_object.has_header:
                 continue
-            # TODO escape value.
-            yield tuple({'value': v, 'image': self.get_image(v)} for v in row)
+            yield tuple({'value': escape(v), 'image': self.get_image(v)} for
+                        v in row)
 
     def get_image(self, url):
         """Get image from database."""

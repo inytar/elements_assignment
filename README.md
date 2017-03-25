@@ -1,6 +1,7 @@
 # A api to upload and view csvs with image links.
 
 This api allows you to upload an csv with links to images. The images will be cached on the server for further downloading.
+All values in the csvs are escaped and thus safe for insetion into html. No formatting is done on the data, as it is expected that the front-end will handle any formatting.
 
 This is a Python 3.5 app, and has not been tested with any other versions of Python.
 
