@@ -78,9 +78,9 @@ class TestCSVView(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(urlparse(
             response.data['csv_file']).path.startswith(settings.MEDIA_URL))
+        # Test that CSV is in database.
         CSV.objects.get(pk=response.data['id'])
 
-    @patch('api.image_downloader.ImageDownloader')
     def test_upload_file_bad_extension(self, ImageDownloader):
         url = reverse('csv-list')
         data = self._create_test_file('/tmp/test_upload.html')
