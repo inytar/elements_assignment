@@ -4,3 +4,4 @@ pillow
 psycopg2
 requests
 rfc3987
+coreapi

@@ -30,12 +30,14 @@ class CSVViewSet(mixins.CreateModelMixin,
 
     retrieve:
     Return the given CSV file with all its rows.
+
+    delete:
+    Delete the CSV file.
     """
     queryset = CSV.objects.all()
     serializer_class = CSVSerializer
 
     def retrieve(self, request, *args, **kwargs):
-        """Add the csv rows to the return value."""
         csv_object = self.get_object()
 
         # Add image if it it exists.

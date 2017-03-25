@@ -41,6 +41,10 @@ To run the application in development:
 
     $ python manage.py runserver
 
+The api can be found under `http://127.0.0.1:8000/api`. Documentation can be found under `http://127.0.0.1:8000/docs`.
+
+Uploading a CSV file using the Django html form gives problems. Using curl does not give this problem.
+
 # Testing
 
 To test run:
