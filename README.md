@@ -45,7 +45,7 @@ To run the application in development:
 
     $ DEBUG=True python manage.py runserver
 
-The api can be found under `http://127.0.0.1:8000/api`. Documentation can be found under `http://127.0.0.1:8000/docs`.
+The api can be found under <http://127.0.0.1:8000/api>. API documentation can be found under <http://127.0.0.1:8000/docs>.
 
 Uploading a CSV file using the Django html form gives problems. Using curl does not give this problem.
 
@@ -57,9 +57,9 @@ To test run:
 
 # Deploying
 
-TODO add a simple docker file for deployment, allow setting config settings throug file or env.
-
-
+For deployment only the requirements in `requirements.txt` need to be installed. The `.env-example` should be renamed .env and
+edited to set the correct deployment setting. It is assumed the app will be run behind a server
+as described in: <https://docs.djangoproject.com/en/1.10/howto/deployment/>.
 
 # Limitations
 It is not possible to search through the csv files. This could be solved by instead of saving the csv files to disk saving a representation of the files in a Postgres JSONB column.
