@@ -19,7 +19,9 @@ class CSV(models.Model):
 
 
 class Image(models.Model):
-    # We are going to search on url often make sure it has a index.
+    # TODO We are going to search on url often make sure it has a index. Also
+    # add a unique and lower to this column, as we should only have one
+    # image per link.
     original_url = models.URLField()
     uploaded = models.DateTimeField(auto_now_add=True)
     original_file = models.ImageField(upload_to='api/images/')
@@ -35,5 +37,5 @@ class Image(models.Model):
 
 class ResizedImage(models.Model):
     image = models.ForeignKey(Image)
-    height = models.CharField(max_length=20)
-    file = models.ImageField(upload_to='api/images/')
+    size = models.CharField(max_length=20)
+    resized_file = models.ImageField(upload_to='api/images/')

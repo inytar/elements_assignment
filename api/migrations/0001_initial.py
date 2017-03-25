@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 import django.contrib.postgres.fields
-import django.contrib.postgres.fields.hstore
 from django.db import migrations, models
 
 
@@ -36,7 +35,6 @@ class Migration(migrations.Migration):
                 ('url', models.URLField()),
                 ('uploaded', models.DateTimeField(auto_now_add=True)),
                 ('original_file', models.ImageField(upload_to='api/images/')),
-                ('resizes', django.contrib.postgres.fields.hstore.HStoreField()),
             ],
             options={
                 'ordering': ('uploaded',),
