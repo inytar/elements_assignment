@@ -1,0 +1,6 @@
+django
+djangorestframework
+pillow
+psycopg2
+requests
+rfc3987
