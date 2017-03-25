@@ -21,6 +21,16 @@ class CSVViewSet(mixins.CreateModelMixin,
                  mixins.DestroyModelMixin,
                  mixins.ListModelMixin,
                  viewsets.GenericViewSet):
+    """
+    list:
+    Return a list of all uploaded CSV files.
+
+    create:
+    Upload a new CSV file.
+
+    retrieve:
+    Return the given CSV file with all its rows.
+    """
     queryset = CSV.objects.all()
     serializer_class = CSVSerializer
 
@@ -71,8 +81,20 @@ class ImageViewSet(mixins.RetrieveModelMixin,
     serializer_class = ImageSerializer
     renderer_classes = (JSONRenderer, ImageRenderer, BrowsableAPIRenderer)
 
+    def metadata(self, request):
+        data = super().metadata(request)
+        print(data)
+        return data
+
     def retrieve(self, request, *args, **kwargs):
-        """Show image instead of return json."""
+        """Return json or image depending on the format.
+
+        If the accept header is set to an image format 'image/*' the image
+        file will be returned.
+
+        Use the 'size' query paramater to get the corect file size.
+        Options are ['thumbnail', 'small', 'medium', 'large', 'original'].
+        """
         size = request.query_params.get('size', 'small').lower()
         if size not in image_sizes:
             return Response(data=['Size must be one of [ {} ]'.
