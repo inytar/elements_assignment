@@ -30,17 +30,18 @@ class ImageDownloader(Process):
         for row in csv_reader(self.csv_file, self.charset):
             for value in row:
                 # Skip already saved files.
-                if Image.objects.filter(original_url__iexact=value):
+                if Image.objects.filter(source__iexact=value):
                     continue
                 image_file, image_type = download_image(value)
                 if image_file is None:
                     continue
                 random_string = get_random_string(RANDOM_FILENAME_LENGTH)
                 # Create database image object and save it.
-                image = Image(original_url=value, type=image_type)
+                image = Image(source=value, type=image_type)
 
+                # Saving file as described in
                 # http://www.revsys.com/blog/2014/dec/03/loading-django-files-from-code/
-                image.original_file.save(
+                image.file.save(
                     '{}.original.{}'.format(random_string, image_type),
                     image_file, save=True
                 )

@@ -55,7 +55,7 @@ class CSVViewSet(mixins.CreateModelMixin,
             # running a query for every image we want to look up. In
             # a future revision get all images associated with this
             # csv at once, and then search for the correct one in python.
-            image = Image.objects.get(original_url__iexact=url)
+            image = Image.objects.get(source__iexact=url)
         except Image.DoesNotExist:
             # No image saved, just return None.
             return None
@@ -72,17 +72,23 @@ class ImageViewSet(mixins.RetrieveModelMixin,
 
     def retrieve(self, request, *args, **kwargs):
         """Show image instead of return json."""
-        if request.accepted_renderer.format == 'image':
-            image = self.get_object()
-            size = 'original'
-            if size.lower() == 'original':
-                img = image
-            else:
-                try:
-                    img = ResizedImage.objects.get(image=image, size=size)
-                except ResizedImage.DoesNotExist:
-                    img = image.resize(size)
-
-            return Response(img.file, content_type='image/{}'.format(image.type))
+        size = request.query_params.get('size', 'small').lower()
+        image_object = self.get_object()
+        size = 'original'
+        if size == 'original':
+            img = image_object
         else:
-            return super().retrieve(request, *args, **kwargs)
+            try:
+                img = ResizedImage.objects.get(image=image_object, size=size)
+            except ResizedImage.DoesNotExist:
+                img = image_object.resize(size)
+        img = img.file
+
+        if request.accepted_renderer.format == 'image':
+            return Response(img,
+                            content_type='image/{}'.format(image_object.type))
+        else:
+            data = self.get_serializer(image_object).data
+            data['size'] = 'size'
+            data['file'] = img.name
+            return Response(data)

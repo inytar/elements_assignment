@@ -61,4 +61,4 @@ class ImageSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Image
         fields = ('url', 'id', 'uploaded', 'type',
-                  'original_url', 'original_file')
+                  'source', 'file')
