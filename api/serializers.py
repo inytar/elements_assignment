@@ -42,7 +42,10 @@ class CSVSerializer(serializers.HyperlinkedModelSerializer):
 
         # Set the header in validated data. Only sets header values not
         # set by the user.
-        validated_data['header'] = header + csv_header[len(header):]
+        header = header + csv_header[len(header):]
+        # Make sure the header is never larger than the amount of columns
+        # in the CSV file.
+        validated_data['header'] = header[:len(self._csv_headers)]
         # In a different process download images.
         ImageDownloader(csv_file, charset).start()
         return super().create(validated_data)
@@ -52,7 +55,11 @@ class CSVSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'id', 'name', 'uploaded', 'has_header', 'header',
                   'csv_file')
         extra_kwargs = {
-            'header': {'required': False},
+            'header': {'required': False,
+                       'help_text': 'A list of headers for this file.'},
+            'has_header': {'help_text':
+                           'A boolean telling if this file has a header.'},
+            'csv_file': {'help_text': 'The CSV file to upload.'},
             'name': {'read_only': True},
         }
 

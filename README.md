@@ -3,6 +3,10 @@
 This api allows you to upload an csv with links to images. The images will be cached on the server for further downloading.
 All values in the csvs are escaped and thus safe for insetion into html. No formatting is done on the data, as it is expected that the front-end will handle any formatting.
 
+There is no restriction on the names and number of columns.
+
+Images can be loaded in different sizes using the `size` query parameter.
+
 This is a Python 3.5 app, and has not been tested with any other versions of Python.
 
 ## Installing

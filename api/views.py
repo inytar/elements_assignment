@@ -28,6 +28,10 @@ class CSVViewSet(mixins.CreateModelMixin,
     create:
     Upload a new CSV file.
 
+    The `header` parameter gives problems
+    when uploading using the Django forms. Using curl does not give this
+    problem.
+
     retrieve:
     Return the given CSV file with all its rows.
 
@@ -91,11 +95,11 @@ class ImageViewSet(mixins.RetrieveModelMixin,
     def retrieve(self, request, *args, **kwargs):
         """Return json or image depending on the format.
 
-        If the accept header is set to an image format 'image/*' the image
+        If the accept header is set to an image format `image/*` the image
         file will be returned.
 
-        Use the 'size' query paramater to get the corect file size.
-        Options are ['thumbnail', 'small', 'medium', 'large', 'original'].
+        Use the `size` query paramater to get the corect file size.
+        Options are [`thumbnail`, `small`, `medium`, `large`, `original`].
         """
         size = request.query_params.get('size', 'small').lower()
         if size not in image_sizes:
