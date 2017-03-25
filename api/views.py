@@ -7,11 +7,12 @@ from rest_framework import decorators
 from rest_framework import mixins
 from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
 from rest_framework.response import Response
+from rest_framework import status
 from rest_framework import viewsets
 
 # Create your views here.
 
-from api.models import CSV, Image, ResizedImage
+from api.models import CSV, Image, image_sizes, ResizedImage
 from api.renderers import ImageRenderer
 from api.serializers import CSVSerializer, ImageSerializer
 
@@ -73,8 +74,11 @@ class ImageViewSet(mixins.RetrieveModelMixin,
     def retrieve(self, request, *args, **kwargs):
         """Show image instead of return json."""
         size = request.query_params.get('size', 'small').lower()
+        if size not in image_sizes:
+            return Response(data=['Size must be one of [ {} ]'.
+                                  format(', '.join(image_sizes))],
+                            status=status.HTTP_400_BAD_REQUEST)
         image_object = self.get_object()
-        size = 'original'
         if size == 'original':
             img = image_object
         else:
@@ -85,10 +89,11 @@ class ImageViewSet(mixins.RetrieveModelMixin,
         img = img.file
 
         if request.accepted_renderer.format == 'image':
+            # Return the image file.
             return Response(img,
                             content_type='image/{}'.format(image_object.type))
         else:
             data = self.get_serializer(image_object).data
-            data['size'] = 'size'
-            data['file'] = img.name
+            data['size'] = size
+            data['file'] = request.build_absolute_uri(img.url)
             return Response(data)
