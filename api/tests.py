@@ -2,11 +2,12 @@ import os
 from unittest.mock import patch
 from urllib.parse import urlparse
 
+from django.contrib.auth.models import User
 from django.core.files.images import ImageFile
-from django.test import TestCase
 from django.urls import reverse
 
 from rest_framework import status
+from rest_framework.test import APITestCase
 
 import requests
 
@@ -19,7 +20,7 @@ from api import image_downloader
 from api.models import CSV
 
 
-class TestImageDownloader(TestCase):
+class TestImageDownloader(APITestCase):
 
     image = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                          'test_image.jpeg')
@@ -60,7 +61,21 @@ class TestImageDownloader(TestCase):
     # TODO Add test for ImageDownloader class.
 
 
-class TestCSVView(TestCase):
+class TestCSVView(APITestCase):
+
+    def setUp(self):
+        self.tearDown()
+        User.objects.create_user('test').save()
+        User.objects.create_user('test_staff', is_staff=True).save()
+
+    def tearDown(self):
+        # Make sure no one is logged in or authenticated.
+        self.client.logout()
+        self.client.force_authenticate(user=None)
+        # Delete all users and CSVs.
+        User.objects.all().delete()
+        CSV.objects.all().delete()
+        # TODO empty media folder.
 
     def _create_test_file(self, path):
         f = open(path, 'w')
@@ -74,6 +89,9 @@ class TestCSVView(TestCase):
         url = reverse('csv-list')
         data = self._create_test_file('/tmp/test_upload.csv')
         data = {'csv_file': data}
+
+        user = User.objects.get(username='test_staff')
+        self.client.force_authenticate(user=user)
 
         response = self.client.post(url, data, format='multipart')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -90,14 +108,32 @@ class TestCSVView(TestCase):
         data = self._create_test_file('/tmp/test_upload.html')
         data = {'csv_file': data}
 
+        user = User.objects.get(username='test_staff')
+        self.client.force_authenticate(user=user)
+
         response = self.client.post(url, data, format='multipart')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(ImageDownloader.called)
 
-    # def test_upload_file_not_parsable(self):
-    #     url = reverse('csv-list')
-    #     data = self._create_test_file('/tmp/test_upload.csv')
-    #     data = {'csv_file': data}
+    @patch('api.image_downloader.ImageDownloader')
+    def test_upload_file_no_login(self, ImageDownloader):
+        url = reverse('csv-list')
+        data = self._create_test_file('/tmp/test_upload.csv')
+        data = {'csv_file': data}
 
-    #     response = self.client.post(url, data, format='multipart')
-    #     self.assertEqual(response.status_code, status.HTTP_400_CREATED)
+        self.client.force_authenticate(user=None)
+
+        response = self.client.post(url, data, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    @patch('api.image_downloader.ImageDownloader')
+    def test_upload_file_not_staff(self, ImageDownloader):
+        url = reverse('csv-list')
+        data = self._create_test_file('/tmp/test_upload.csv')
+        data = {'csv_file': data}
+
+        user = User.objects.get(username='test')
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(url, data, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

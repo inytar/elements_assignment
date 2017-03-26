@@ -35,9 +35,13 @@ Create new database and database user:
     $ sudo -u postgres psql -c "CREATE USER elements WITH PASSWORD 'elements' CREATEDB"
     $ sudo -u postgres psql -c "CREATE DATBASE elements OWNER elements"
 
-Run the migrations
+Run the migrations:
 
     $ python manage.py migrate
+
+Create a superuser;
+
+    $ python manage.py createsuperuser
 
 # Running
 
@@ -64,6 +68,6 @@ as described in: <https://docs.djangoproject.com/en/1.10/howto/deployment/>.
 # Limitations
 It is not possible to search through the csv files. This could be solved by instead of saving the csv files to disk saving a representation of the files in a Postgres JSONB column.
 
-As we allow uploading files we are vulnerable to: <https://docs.djangoproject.com/en/1.10/topics/security/#user-uploaded-content>. To migate this problem it is simple to implent a basic authentication scheme so that only admins can upload a new csv file.
+As we allow uploading files we are vulnerable to: <https://docs.djangoproject.com/en/1.10/topics/security/#user-uploaded-content>. To migate this problem only authenticated users are allowed to upload a new CSV file.
 
 It is not possible to add, delete or edit a row in a csv file, if a csv file has beeen edited it must be uploaded again.

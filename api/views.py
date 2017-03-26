@@ -13,6 +13,7 @@ from rest_framework import viewsets
 # Create your views here.
 
 from api.models import CSV, Image, image_sizes, ResizedImage
+from api.permissions import IsAdminUserOrReadOnly
 from api.renderers import ImageRenderer
 from api.serializers import CSVSerializer, ImageSerializer
 
@@ -40,6 +41,7 @@ class CSVViewSet(mixins.CreateModelMixin,
     """
     queryset = CSV.objects.all()
     serializer_class = CSVSerializer
+    permission_classes = (IsAdminUserOrReadOnly,)
 
     def retrieve(self, request, *args, **kwargs):
         csv_object = self.get_object()

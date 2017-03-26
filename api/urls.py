@@ -10,4 +10,6 @@ router.register(r'csvs', views.CSVViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
+    url(r'^auth/', include('rest_framework.urls',
+                           namespace='rest_framework')),
 ]
